@@ -1,0 +1,313 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: '2'
+  resourceVersion: '908776199'
+  name: mcp-idp-delegate
+  uid: 9296b682-0c70-49ca-b621-8ed6f067c7c2
+  creationTimestamp: '2024-05-23T18:19:12Z'
+  generation: 2
+  managedFields:
+    - manager: Mozilla
+      operation: Update
+      apiVersion: apps/v1
+      time: '2024-05-23T18:21:44Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:labels':
+            .: {}
+            'f:harness.io/name': {}
+        'f:spec':
+          'f:progressDeadlineSeconds': {}
+          'f:replicas': {}
+          'f:revisionHistoryLimit': {}
+          'f:selector': {}
+          'f:strategy':
+            'f:rollingUpdate':
+              .: {}
+              'f:maxSurge': {}
+              'f:maxUnavailable': {}
+            'f:type': {}
+          'f:template':
+            'f:metadata':
+              'f:annotations':
+                .: {}
+                'f:prometheus.io/path': {}
+                'f:prometheus.io/port': {}
+                'f:prometheus.io/scrape': {}
+              'f:labels':
+                .: {}
+                'f:harness.io/name': {}
+            'f:spec':
+              'f:containers':
+                'k:{"name":"delegate"}':
+                  'f:envFrom': {}
+                  'f:image': {}
+                  'f:startupProbe':
+                    .: {}
+                    'f:failureThreshold': {}
+                    'f:httpGet':
+                      .: {}
+                      'f:path': {}
+                      'f:port': {}
+                      'f:scheme': {}
+                    'f:initialDelaySeconds': {}
+                    'f:periodSeconds': {}
+                    'f:successThreshold': {}
+                    'f:timeoutSeconds': {}
+                  'f:terminationMessagePolicy': {}
+                  .: {}
+                  'f:resources':
+                    .: {}
+                    'f:limits':
+                      .: {}
+                      'f:cpu': {}
+                      'f:memory': {}
+                    'f:requests':
+                      .: {}
+                      'f:cpu': {}
+                      'f:memory': {}
+                  'f:livenessProbe':
+                    .: {}
+                    'f:failureThreshold': {}
+                    'f:httpGet':
+                      .: {}
+                      'f:path': {}
+                      'f:port': {}
+                      'f:scheme': {}
+                    'f:initialDelaySeconds': {}
+                    'f:periodSeconds': {}
+                    'f:successThreshold': {}
+                    'f:timeoutSeconds': {}
+                  'f:env':
+                    'k:{"name":"MANAGER_HOST_AND_PORT"}':
+                      .: {}
+                      'f:name': {}
+                      'f:value': {}
+                    'k:{"name":"DELEGATE_NAMESPACE"}':
+                      .: {}
+                      'f:name': {}
+                      'f:valueFrom':
+                        .: {}
+                        'f:fieldRef': {}
+                    'k:{"name":"DELEGATE_TAGS"}':
+                      .: {}
+                      'f:name': {}
+                      'f:value': {}
+                    'k:{"name":"DELEGATE_DESCRIPTION"}':
+                      .: {}
+                      'f:name': {}
+                    'k:{"name":"DELEGATE_TYPE"}':
+                      .: {}
+                      'f:name': {}
+                      'f:value': {}
+                    'k:{"name":"NEXT_GEN"}':
+                      .: {}
+                      'f:name': {}
+                      'f:value': {}
+                    'k:{"name":"DEPLOY_MODE"}':
+                      .: {}
+                      'f:name': {}
+                      'f:value': {}
+                    .: {}
+                    'k:{"name":"JAVA_OPTS"}':
+                      .: {}
+                      'f:name': {}
+                      'f:value': {}
+                    'k:{"name":"ACCOUNT_ID"}':
+                      .: {}
+                      'f:name': {}
+                      'f:value': {}
+                    'k:{"name":"SCM_SERVER_MAX_POOL_SIZE"}':
+                      .: {}
+                      'f:name': {}
+                      'f:value': {}
+                    'k:{"name":"DELEGATE_NAME"}':
+                      .: {}
+                      'f:name': {}
+                      'f:value': {}
+                    'k:{"name":"LOG_STREAMING_SERVICE_URL"}':
+                      .: {}
+                      'f:name': {}
+                      'f:value': {}
+                    'k:{"name":"CLIENT_TOOLS_DOWNLOAD_DISABLED"}':
+                      .: {}
+                      'f:name': {}
+                      'f:value': {}
+                  'f:securityContext':
+                    .: {}
+                    'f:allowPrivilegeEscalation': {}
+                  'f:terminationMessagePath': {}
+                  'f:imagePullPolicy': {}
+                  'f:ports':
+                    .: {}
+                    'k:{"containerPort":8080,"protocol":"TCP"}':
+                      .: {}
+                      'f:containerPort': {}
+                      'f:protocol': {}
+                  'f:name': {}
+              'f:dnsPolicy': {}
+              'f:restartPolicy': {}
+              'f:schedulerName': {}
+              'f:securityContext': {}
+              'f:serviceAccount': {}
+              'f:serviceAccountName': {}
+              'f:terminationGracePeriodSeconds': {}
+    - manager: kube-controller-manager
+      operation: Update
+      apiVersion: apps/v1
+      time: '2025-01-22T08:07:10Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:annotations':
+            .: {}
+            'f:deployment.kubernetes.io/revision': {}
+        'f:status':
+          'f:availableReplicas': {}
+          'f:conditions':
+            .: {}
+            'k:{"type":"Available"}':
+              .: {}
+              'f:lastTransitionTime': {}
+              'f:lastUpdateTime': {}
+              'f:message': {}
+              'f:reason': {}
+              'f:status': {}
+              'f:type': {}
+            'k:{"type":"Progressing"}':
+              .: {}
+              'f:lastTransitionTime': {}
+              'f:lastUpdateTime': {}
+              'f:message': {}
+              'f:reason': {}
+              'f:status': {}
+              'f:type': {}
+          'f:observedGeneration': {}
+          'f:readyReplicas': {}
+          'f:replicas': {}
+          'f:updatedReplicas': {}
+      subresource: status
+  namespace: hrn-swg-ops3
+  labels:
+    harness.io/name: mcp-idp-delegate
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      harness.io/name: delegate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        harness.io/name: delegate
+      annotations:
+        prometheus.io/path: /api/metrics
+        prometheus.io/port: '3460'
+        prometheus.io/scrape: 'true'
+    spec:
+      containers:
+        - resources:
+            limits:
+              cpu: '1'
+              memory: 2Gi
+            requests:
+              cpu: 500m
+              memory: 2Gi
+          terminationMessagePath: /dev/termination-log
+          name: delegate
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3460
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          env:
+            - name: JAVA_OPTS
+              value: '-Xms64M'
+            - name: ACCOUNT_ID
+              value: XzgUIuZXRMWymCzLKYZpCg
+            - name: MANAGER_HOST_AND_PORT
+              value: 'https://app.harness.io/gratis'
+            - name: DEPLOY_MODE
+              value: KUBERNETES
+            - name: DELEGATE_NAME
+              value: mcp-idp-delegate
+            - name: DELEGATE_TYPE
+              value: KUBERNETES
+            - name: DELEGATE_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: DELEGATE_DESCRIPTION
+            - name: DELEGATE_TAGS
+              value: idp
+            - name: NEXT_GEN
+              value: 'true'
+            - name: CLIENT_TOOLS_DOWNLOAD_DISABLED
+              value: 'true'
+            - name: LOG_STREAMING_SERVICE_URL
+              value: 'https://app.harness.io/gratis/log-service/'
+            - name: SCM_SERVER_MAX_POOL_SIZE
+              value: '25'
+          securityContext:
+            allowPrivilegeEscalation: false
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          imagePullPolicy: Always
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: 3460
+              scheme: HTTP
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 15
+          terminationMessagePolicy: File
+          envFrom:
+            - secretRef:
+                name: mcp-idp-delegate-account-token
+          image: 'harness-docker-dev.docker.fis.dev/harness/delegate:24.04.82901'
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 600
+      dnsPolicy: ClusterFirst
+      serviceAccountName: svc-harness
+      serviceAccount: svc-harness
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
+status:
+  observedGeneration: 2
+  replicas: 1
+  updatedReplicas: 1
+  readyReplicas: 1
+  availableReplicas: 1
+  conditions:
+    - type: Progressing
+      status: 'True'
+      lastUpdateTime: '2024-05-23T18:22:34Z'
+      lastTransitionTime: '2024-05-23T18:19:12Z'
+      reason: NewReplicaSetAvailable
+      message: ReplicaSet "mcp-idp-delegate-7c96d5b75c" has successfully progressed.
+    - type: Available
+      status: 'True'
+      lastUpdateTime: '2025-01-22T08:07:10Z'
+      lastTransitionTime: '2025-01-22T08:07:10Z'
+      reason: MinimumReplicasAvailable
+      message: Deployment has minimum availability.

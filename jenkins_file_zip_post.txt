@@ -1,0 +1,53 @@
+@Library('epo-pipeline-library@master') _
+def cicdServiceAccount = "cax-svc-acct"
+def jenkinsCredentialsId = "SvcAcct-cax-cicd"
+def cloudId = "cax-cicd"
+def cicdNamespace = "cax-cicd"
+def deployNamespace = 'prf-cf-devops'
+def publishedChart = "cape-ras-api-custom-reports-rd-3.7-latest.tgz"
+def publishedURL = "https://artifactory.fis.dev/artifactory/cax-helm-snapshot-local/"+publishedChart
+
+ 
+
+////////////////////////////////////////////////////////
+def buildAgent = agentBuilder(
+  cloud: cloudId,
+  namespace: cicdNamespace,
+  qualifier: 'azure',
+  enableLfs: 'true',
+  agents: [
+    epo.standardAgents().oc,
+    epo.standardAgents().helm3,
+    epo.standardAgents().jnpl
+  ]
+)
+///////////////////////////////////////////////////////
+def updatePush = { chartNames -> 
+  chartNames.each { name ->
+    sh """
+      helm dependency update $name
+      helm_push $name cax-helm-dev
+    """  
+  }
+}
+
+ 
+
+///////////////////////////////////////////////////////
+def stages = [
+  publishCustomScripts: {
+    echo 'publishCustomScripts'
+    sh "rm -rf ./charts ./custom_scripts ./*.tgz"
+    checkout scm
+    sh "zip -r ${publishedChart} data/ras/env/CustomReports/3.7"
+
+ 
+
+     sh "curl -u Username:'password' -X PUT ${publishedURL} -T ${publishedChart}"
+
+ 
+
+  }
+]
+
+
