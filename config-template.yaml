@@ -1,0 +1,30 @@
+phase_type: SIT
+phase: SIT
+credentials:
+  - id: "jira"
+    platform_id: jira
+    server: "https://jira.fis.dev"
+    token: "<+secrets.getValue('RO_Jira_Token')"
+  - id: "keptn_dev"
+    platform_id: keptn
+    instance: DEV
+    token: "<+secrets.getValue('RO_Keptn_Token')>"
+assets:
+  - sc_asset_id: "10003137" 
+
+    evaluations:
+      - policy: Integration Testing
+        category: Testing/Readiness
+        platform: jira
+        credentials_ref: "jira"
+        platform_values:
+          critical_filter: "548345"
+          high_filter: "548346"
+          medium_filter: "548347"
+          low_filter: "548348"
+      - policy: Performance Testing
+        quality_gate: Testing/Readiness
+        platform: keptn
+        credentials_ref: "keptn_dev"
+        platform_values: 
+          context_id: "20695bfe-7126-4814-aa33-4c2c5426cd51"

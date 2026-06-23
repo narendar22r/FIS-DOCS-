@@ -1,0 +1,165 @@
+pipeline {
+    agent any
+
+    parameters {
+        choice(name: 'RELEASE_TYPE', choices: ['FullRelease', 'PatchRelease', 'NewDevelopCreation'], description: 'Select release type: full, component, or New Develop creation')
+        string(name: 'DEVELOP_VERSION', defaultValue: '', description: 'Enter the develop branch version eg: SW_7.0.25.1 for release branch creation')
+        string(name: 'VERSION', defaultValue: '', description: 'Enter the release branch version eg: SW_7.7.0.25.1 for release branch creation')
+        string(name: 'PREVIOUS_RELEASE_VERSION', defaultValue: '', description: 'Enter the develop branch version eg: SW_7.0.25.1 for release branch creation')
+    }
+
+    environment {
+        GIT_CREDENTIALS_ID = 'cm-credentials-id'
+        CREATED_BRANCHES = ''
+        BITBUCKET_BASE_URL = 'https://bitbucket.fis.dev/scm/istmas'
+    }
+
+    stages {
+        stage('Set Job Name') {
+            steps {
+                script {
+                    if (params.RELEASE_TYPE == 'FullRelease' || params.RELEASE_TYPE == 'NewDevelopCreation' || params.RELEASE_TYPE == 'PatchRelease') {
+                        currentBuild.description = "${params.RELEASE_TYPE}_${params.DEVELOP_VERSION}_${params.VERSION}"
+                    }
+                }
+            }
+        }
+
+        stage('Full Release started for all Components') {
+            when {
+                expression { params.RELEASE_TYPE == 'FullRelease' }
+            }
+            steps {
+                script {
+                    def paramsYaml = readYaml(file: './params.yaml')
+                    echo "params.yaml content: ${paramsYaml}"
+                    def componentList = paramsYaml.COMPONENTS
+                    if (componentList == null) {
+                        error "COMPONENTS key not found in params.yaml"
+                    }
+                    echo "Component List: ${componentList}"
+                    def releaseBranches = []
+                    for (component in componentList) {
+                        dir(component) {
+                            try {
+                                def repoUrl = "${BITBUCKET_BASE_URL}/${component}.git"
+                                def branchDevelopName = "develop/${params.DEVELOP_VERSION}"
+                                echo "${repoUrl}"
+                                echo "develop/${params.DEVELOP_VERSION}"
+                                echo "Processing Full release for ${component}..."
+                                git credentialsId: env.GIT_CREDENTIALS_ID, url: repoUrl
+                                sh "git remote set-url origin ${repoUrl}"
+                                //sh "git fetch --all"
+                                def branchExists = sh(script: "git branch -r | grep origin/${branchDevelopName} || true", returnStdout: true).trim()
+                                if (!branchExists) {
+                                    error("Develop branch ${branchDevelopName} does not exist for ${component}.")
+                                }
+                                sh "git checkout -b ${branchDevelopName} origin/${branchDevelopName}"
+                                sh "git config --global credential.helper store"
+                                sh "git pull origin ${branchDevelopName}"
+                                writeFile(file: 'VERSION', text: params.VERSION)
+                                git config --global user.email "Gaurav.Gupta3@fisglobal.com"
+                                git config --global user.name "Gaurav Gupta"
+                                sh "git commit -am 'Bumping version to ${params.VERSION}'"
+                                def newBranch = "featureTest/SW_${params.VERSION}"
+                                sh "git checkout -b ${newBranch}"
+                                sh "git push origin ${newBranch}"
+                                echo "Created new release branch: ${newBranch}"
+                                env.CREATED_BRANCHES += "${newBranch}, "
+                                releaseBranches.add(newBranch)
+                            } catch (Exception e) {
+                                echo "Error processing ${component}: ${e.message}"
+                                error("Failed to create release branch for ${component}")
+                            }
+                        }
+                    }
+                    echo "New Release Branches Created: ${releaseBranches.join(', ')}"
+                }
+            }
+        }
+        stage('Patch Release Creation') {
+            when {
+                expression { params.RELEASE_TYPE == 'PatchRelease' }
+            }
+            steps {
+                script {
+                    def repoMap = new groovy.json.JsonSlurper().parseText(env.REPOS)
+                    def releaseBranches = []
+                    parallel repoMap.collectEntries { component, repo ->
+                        ["Patch_release_${component}": {
+                            dir(component) {
+                                try {
+                                    echo "Processing Patch release for ${component}..."
+                                    git credentialsId: env.GIT_CREDENTIALS_ID, url: repo, branch: "release/${params.PREVIOUS_RELEASE_VERSION}"
+                                    sh "git fetch --all"
+                                    sh "git checkout -b patch/SW_${params.VERSION} origin/release/${params.PREVIOUS_RELEASE_VERSION}"
+                                    sh "git pull"
+                                    writeFile(file: 'VERSION', text: params.VERSION)
+                                    sh "git commit -am 'Bumping version to ${params.VERSION}'"
+                                    def newBranch = "patch/SW_${params.VERSION}"
+                                    sh "git checkout -b ${newBranch}"
+                                    sh "git push origin ${newBranch}"
+                                    echo "Created new patch release branch: ${newBranch}"
+                                    env.CREATED_BRANCHES += "${newBranch}, "
+                                    releaseBranches.add(newBranch)
+                                } catch (Exception e) {
+                                    echo "Error processing ${component}: ${e.message}"
+                                    error("Failed to create patch release branch for ${component}")
+                                }
+                            }
+                        }]
+                    }
+                    echo "New Patch Release Branches Created: ${releaseBranches.join(', ')}"
+                }
+            }
+        }
+
+        stage('New Develop Branch Creation') {
+            when {
+                expression { params.RELEASE_TYPE == 'NewDevelopCreation' }
+            }
+            steps {
+                script {
+                    def repoMap = new groovy.json.JsonSlurper().parseText(env.REPOS)
+                    def releaseBranches = []
+                    parallel repoMap.collectEntries { component, repo ->
+                        ["New_develop_${component}": {
+                            dir(component) {
+                                try {
+                                    echo "Creating new develop branch for ${component}..."
+                                    git credentialsId: env.GIT_CREDENTIALS_ID, url: repo, branch: 'develop'
+                                    sh "git fetch --all"
+                                    sh "git checkout -b develop/SW_${params.DEVELOP_VERSION} origin/develop"
+                                    sh "git pull"
+                                    writeFile(file: 'VERSION', text: params.VERSION)
+                                    sh "git commit -am 'Bumping version to ${params.VERSION}'"
+                                    def newBranch = "develop/SW_${params.VERSION}"
+                                    sh "git checkout -b ${newBranch}"
+                                    sh "git push origin ${newBranch}"
+                                    echo "Created new develop branch: ${newBranch}"
+                                    env.CREATED_BRANCHES += "${newBranch}, "
+                                    releaseBranches.add(newBranch)
+                                } catch (Exception e) {
+                                    echo "Error processing ${component}: ${e.message}"
+                                    error("Failed to create develop branch for ${component}")
+                                }
+                            }
+                        }]
+                    }
+                    echo "New Develop Branches Created: ${releaseBranches.join(', ')}"
+                }
+            }
+        }
+    }
+    post {
+        always {
+            cleanWs deleteDirs: true, notFailBuild: true
+        }
+        success {
+            echo "All components release branch executed Successfully !!"
+        }
+        failure {
+            echo "Some components failed! Please check the logs."
+        }
+    }
+}

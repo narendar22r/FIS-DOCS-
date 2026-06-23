@@ -1,0 +1,44 @@
+{
+  "phase": "SIT",
+  "credentials": [
+    {
+      "id": "jira",
+      "platform_id": "jira",
+      "server": "https://jira.fis.dev",
+      "token": "<+secrets.getValue('RO_Jira_Token')>"
+    },
+    {
+      "id": "keptn_dev",
+      "platform_id": "keptn",
+      "instance": "DEV",
+      "token": "<+secrets.getValue('RO_Keptn_Token')>"
+    }
+  ],
+  "assets": [
+    {
+      "sc_asset_id": "11564",
+      "evaluations": [
+        {
+          "policy": "fis/pac/segment/banking/functional_testing/functional_testing_status",
+          "quality_gate": "functional",
+          "platform": "jira",
+          "credentials_ref": "jira",
+          "platform_values": {
+            "critical_filter": "548345",
+            "high_filter": "548346",
+            "medium_filter": "548347",
+            "low_filter": "548348"
+          }
+          
+        },
+        {
+          "policy": "fis/pac/segment/banking/sre/keptn/keptn_status",
+          "quality_gate": "reliability",
+          "platform": "keptn",
+          "credentials_ref": "keptn_dev",
+          "platform_values": {}
+        }
+      ]
+    }
+  ]
+}
